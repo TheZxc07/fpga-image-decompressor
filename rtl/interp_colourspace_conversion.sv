@@ -437,7 +437,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				op_select_RGB <= 2'd1;
 				
 				V_accumulator <= V_accumulator + prod_2;
-				U_accumulator <= 16'd128 + prod_3; 
+				U_accumulator <= 32'd128 + prod_3; 
 				
 				R_accumulator_E <= prod_1[31:0];
 				R_accumulator_O <= prod_4[31:0];
@@ -1146,7 +1146,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				
 				SRAM_write_data <= {B_accumulator_E[23:16], R_accumulator_O[23:16]};
 			
-				//UCSC_sram_data[0] <= SRAM_read_data;
+				UCSC_sram_data[0] <= SRAM_read_data;
 			
 				FIR_bufV[0] <= FIR_bufV[5];
 				
@@ -1181,7 +1181,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				
 				SRAM_write_data <= {G_accumulator_O[23:16], B_accumulator_O[23:16]};
 				
-				//UCSC_sram_data[1] <= SRAM_read_data;
+				UCSC_sram_data[1] <= SRAM_read_data;
 				
 				FIR_bufV[0] <= FIR_bufV[5];
 				FIR_bufU[0] <= FIR_bufU[5];
