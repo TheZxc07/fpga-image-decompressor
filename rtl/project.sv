@@ -70,12 +70,18 @@ logic SRAM_we_n;
 logic [15:0] SRAM_read_data;
 logic SRAM_ready;
 
+logic M1_finish;
+logic M1_start;
+
 // For UART SRAM interface
 logic UART_rx_enable;
 logic UART_rx_initialize;
 logic [17:0] UART_SRAM_address;
+logic [17:0] UCSC_SRAM_address;
 logic [15:0] UART_SRAM_write_data;
+logic [15:0] UCSC_SRAM_write_data;
 logic UART_SRAM_we_n;
+logic UCSC_SRAM_we_n;
 logic [25:0] UART_timer;
 
 logic [6:0] value_7_segment [7:0];
@@ -153,6 +159,19 @@ SRAM_controller SRAM_unit (
 	.SRAM_OE_N_O(SRAM_OE_N_O)
 );
 
+interp_colourspace_conversion UCSC_unit (
+	.Clock(CLOCK_50_I),
+	.Resetn(resetn),
+	
+	.SRAM_read_data(SRAM_read_data),
+	.Start(M1_start),
+	.Finish(M1_finish),
+	
+	.SRAM_we_n(UCSC_SRAM_we_n),
+	.SRAM_write_data(UCSC_SRAM_write_data),
+	.SRAM_address(UCSC_SRAM_address)
+);
+
 assign SRAM_ADDRESS_O[19:18] = 2'b00;
 
 always @(posedge CLOCK_50_I or negedge resetn) begin
@@ -164,6 +183,8 @@ always @(posedge CLOCK_50_I or negedge resetn) begin
 		UART_timer <= 26'd0;
 		
 		VGA_enable <= 1'b1;
+		
+		M1_start <= 1'b0;
 	end else begin
 
 		// By default the UART timer (used for timeout detection) is incremented
@@ -198,9 +219,20 @@ always @(posedge CLOCK_50_I or negedge resetn) begin
 
 			// Timeout for 1 sec on UART (detect if file transmission is finished)
 			if (UART_timer == 26'd49999999) begin
-				top_state <= S_IDLE;
+				M1_start <= 1'b1;
+				top_state <= S_M1;
 				UART_timer <= 26'd0;
 			end
+		end
+		
+		S_M1: begin
+		
+			if (M1_finish) begin
+			
+				top_state <= S_IDLE;
+				
+			end
+		
 		end
 
 		default: top_state <= S_IDLE;
@@ -212,14 +244,44 @@ end
 // for this design we assume that the RGB data starts at location 0 in the external SRAM
 // if the memory layout is different, this value should be adjusted 
 // to match the starting address of the raw RGB data segment
-assign VGA_base_address = 18'd0;
+assign VGA_base_address = 18'd146944;
 
 // Give access to SRAM for UART and VGA at appropriate time
-assign SRAM_address = (top_state == S_UART_RX) ? UART_SRAM_address : VGA_SRAM_address;
+//assign SRAM_address = (top_state == S_UART_RX) ? UART_SRAM_address : VGA_SRAM_address;
+//
+//assign SRAM_write_data = (top_state == S_UART_RX) ? UART_SRAM_write_data : 16'd0;//
+//
+//assign SRAM_we_n = (top_state == S_UART_RX) ? UART_SRAM_we_n : 1'b1;
 
-assign SRAM_write_data = (top_state == S_UART_RX) ? UART_SRAM_write_data : 16'd0;
+always_comb begin
 
-assign SRAM_we_n = (top_state == S_UART_RX) ? UART_SRAM_we_n : 1'b1;
+	case(top_state)
+		
+		S_UART_RX: begin
+		
+			SRAM_write_data = UART_SRAM_write_data;
+			SRAM_we_n = UART_SRAM_we_n;
+			SRAM_address = UART_SRAM_address;
+		
+		end
+	
+		S_M1: begin
+		
+			SRAM_write_data = UCSC_SRAM_write_data;
+			SRAM_we_n = UCSC_SRAM_we_n;
+			SRAM_address = UCSC_SRAM_address;
+		
+		end
+		
+		default: begin
+		
+			SRAM_address = VGA_SRAM_address;
+			SRAM_write_data = 16'd0;
+			SRAM_we_n = 1'b1;
+		
+		end
+	endcase
+end
 
 // 7 segment displays
 convert_hex_to_seven_segment unit7 (

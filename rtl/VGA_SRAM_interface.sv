@@ -92,7 +92,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 			// we are not in VGA state
 			VGA_red <= 8'h3F;
  			VGA_green <= 8'h3F;
-	   		VGA_blue <= 8'h3F;								
+	   	VGA_blue <= 8'h3F;								
 		end else begin
 			case (VGA_SRAM_state)
 			S_VS_WAIT_NEW_PIXEL_ROW: begin

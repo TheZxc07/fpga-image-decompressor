@@ -26,7 +26,7 @@ add your own.
 `include "../rtl/VGA_param.h"
 
 `define FEOF 32'hFFFFFFFF
-`define MAX_MISMATCHES 10
+`define MAX_MISMATCHES 10000
 
 // file for output
 // this is only useful if decoding is done all the way through
@@ -298,8 +298,10 @@ module TB;
 				// $write("m1 state %d\n", UUT.m1.state);
 				$write("... or take a look at the last few clock cycles in the waveforms that lead up to this error\n");
 				number_of_mismatches = number_of_mismatches + 1;
-				if (number_of_mismatches == `MAX_MISMATCHES)
+				if (number_of_mismatches == `MAX_MISMATCHES) begin
+					write_PPM_file;
 					$stop;
+				end
 			end
 
 			SRAM_ARRAY_write_count[UUT.SRAM_address] = SRAM_ARRAY_write_count[UUT.SRAM_address] + 1;
