@@ -64,6 +64,14 @@ logic [31:0] R_accumulator_O;
 logic [31:0] G_accumulator_O;
 logic [31:0] B_accumulator_O;
 
+logic [7:0] R_E;
+logic [7:0] G_E;
+logic [7:0] B_E;
+
+logic [7:0] R_O;
+logic [7:0] G_O;
+logic [7:0] B_O;
+
 logic [31:0] cache_E;
 logic [31:0] cache_O;
 
@@ -545,7 +553,8 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				SRAM_address <= SRAM_address_RGB;
 				SRAM_address_RGB <= SRAM_address_RGB + 18'd1;
 				
-				SRAM_write_data <= {R_accumulator_E[23:16], G_accumulator_E[23:16]};
+				SRAM_write_data <= {R_E, G_E};
+				//SRAM_write_data <= {R_accumulator_E[23:16], G_accumulator_E[23:16]};
 				SRAM_we_n <= 1'b0;
 				
 				Y <= SRAM_read_data;
@@ -581,7 +590,8 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				SRAM_address <= SRAM_address_RGB;
 				SRAM_address_RGB <= SRAM_address_RGB + 18'd1;
 				
-				SRAM_write_data <= {B_accumulator_E[23:16], R_accumulator_O[23:16]};
+				SRAM_write_data <= {B_E, R_O};
+				//SRAM_write_data <= {B_accumulator_E[23:16], R_accumulator_O[23:16]};
 				
 				FIR_bufU[5] <= UCSC_sram_data[1][15:8];
 				FIR_bufV[5] <= FIR_bufV[0];
@@ -617,7 +627,8 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				SRAM_address <= SRAM_address_RGB;
 				SRAM_address_RGB <= SRAM_address_RGB + 18'd1;
 				
-				SRAM_write_data <= {G_accumulator_O[23:16], B_accumulator_O[23:16]};
+				SRAM_write_data <= {G_O, B_O};
+				//SRAM_write_data <= {G_accumulator_O[23:16], B_accumulator_O[23:16]};
 
 				FIR_bufU[5] <= FIR_bufU[0];
 				FIR_bufV[5] <= FIR_bufV[0];
@@ -735,7 +746,8 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				
 				SRAM_we_n <= 1'b0;
 				
-				SRAM_write_data <= {R_accumulator_E[23:16], G_accumulator_E[23:16]};
+				SRAM_write_data <= {R_E, G_E};
+				//SRAM_write_data <= {R_accumulator_E[23:16], G_accumulator_E[23:16]};
 				
 				Y <= SRAM_read_data;
 				
@@ -773,7 +785,8 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				SRAM_address <= SRAM_address_RGB;
 				SRAM_address_RGB <= SRAM_address_RGB + 18'd1;
 				
-				SRAM_write_data <= {B_accumulator_E[23:16], R_accumulator_O[23:16]};
+				SRAM_write_data <= {B_E, R_O};
+				//SRAM_write_data <= {B_accumulator_E[23:16], R_accumulator_O[23:16]};
 
 				UCSC_sram_data[0] <= SRAM_read_data;
 				
@@ -811,7 +824,8 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				SRAM_address <= SRAM_address_RGB;
 				SRAM_address_RGB <= SRAM_address_RGB + 18'd1;
 				
-				SRAM_write_data <= {G_accumulator_O[23:16], B_accumulator_O[23:16]};
+				SRAM_write_data <= {G_O, B_O};
+				//SRAM_write_data <= {G_accumulator_O[23:16], B_accumulator_O[23:16]};
 				
 				UCSC_sram_data[1] <= SRAM_read_data;
 			
@@ -930,7 +944,8 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				SRAM_address <= SRAM_address_RGB;
 				SRAM_address_RGB <= SRAM_address_RGB + 18'd1;
 				
-				SRAM_write_data <= {R_accumulator_E[23:16], G_accumulator_E[23:16]};
+				SRAM_write_data <= {R_E, G_E};
+				//SRAM_write_data <= {R_accumulator_E[23:16], G_accumulator_E[23:16]};
 				SRAM_we_n <= 1'b0;
 				
 				Y <= SRAM_read_data;
@@ -964,7 +979,8 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				SRAM_address <= SRAM_address_RGB;
 				SRAM_address_RGB <= SRAM_address_RGB + 18'd1;
 				
-				SRAM_write_data <= {B_accumulator_E[23:16], R_accumulator_O[23:16]};
+				SRAM_write_data <= {B_E, R_O};
+				//SRAM_write_data <= {B_accumulator_E[23:16], R_accumulator_O[23:16]};
 				
 				FIR_bufU[5] <= UCSC_sram_data[1][15:8];
 				FIR_bufV[5] <= FIR_bufV[0];
@@ -1001,7 +1017,8 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				SRAM_address <= SRAM_address_RGB;
 				SRAM_address_RGB <= SRAM_address_RGB + 18'd1;
 				
-				SRAM_write_data <= {G_accumulator_O[23:16], B_accumulator_O[23:16]};
+				SRAM_write_data <= {G_O, B_O};
+				//SRAM_write_data <= {G_accumulator_O[23:16], B_accumulator_O[23:16]};
 
 				FIR_bufU[5] <= FIR_bufU[0];
 				FIR_bufV[5] <= FIR_bufV[0];
@@ -1115,7 +1132,8 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				SRAM_address <= SRAM_address_RGB;
 				SRAM_address_RGB <= SRAM_address_RGB + 18'd1;
 				
-				SRAM_write_data <= {R_accumulator_E[23:16], G_accumulator_E[23:16]};
+				SRAM_write_data <= {R_E, G_E};
+				//SRAM_write_data <= {R_accumulator_E[23:16], G_accumulator_E[23:16]};
 				SRAM_we_n <= 1'b0;
 				
 				Y <= SRAM_read_data;
@@ -1144,7 +1162,8 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				SRAM_address <= SRAM_address_RGB;
 				SRAM_address_RGB <= SRAM_address_RGB + 18'd1;
 				
-				SRAM_write_data <= {B_accumulator_E[23:16], R_accumulator_O[23:16]};
+				SRAM_write_data <= {B_E, R_O};
+				//SRAM_write_data <= {B_accumulator_E[23:16], R_accumulator_O[23:16]};
 			
 				UCSC_sram_data[0] <= SRAM_read_data;
 			
@@ -1179,7 +1198,8 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				SRAM_address <= SRAM_address_RGB;
 				SRAM_address_RGB <= SRAM_address_RGB + 18'd1;
 				
-				SRAM_write_data <= {G_accumulator_O[23:16], B_accumulator_O[23:16]};
+				SRAM_write_data <= {G_O, B_O};
+				//SRAM_write_data <= {G_accumulator_O[23:16], B_accumulator_O[23:16]};
 				
 				UCSC_sram_data[1] <= SRAM_read_data;
 				
@@ -1295,7 +1315,8 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				SRAM_address <= SRAM_address_RGB;
 				SRAM_address_RGB <= SRAM_address_RGB + 18'd1;
 			
-				SRAM_write_data <= {R_accumulator_E[23:16], G_accumulator_E[23:16]};
+				SRAM_write_data <= {R_E, G_E};
+				//SRAM_write_data <= {R_accumulator_E[23:16], G_accumulator_E[23:16]};
 				SRAM_we_n <= 1'b0;
 				
 				Y <= SRAM_read_data;
@@ -1328,7 +1349,8 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				SRAM_address <= SRAM_address_RGB;
 				SRAM_address_RGB <= SRAM_address_RGB + 18'd1;
 				
-				SRAM_write_data <= {B_accumulator_E[23:16], R_accumulator_O[23:16]};
+				SRAM_write_data <= {B_E, R_O};
+				//SRAM_write_data <= {B_accumulator_E[23:16], R_accumulator_O[23:16]};
 			
 				FIR_bufV[5] <= FIR_bufV[0];
 				FIR_bufU[5] <= FIR_bufU[0];
@@ -1365,7 +1387,8 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				SRAM_address <= SRAM_address_RGB;
 				SRAM_address_RGB <= SRAM_address_RGB + 18'd1;
 			
-				SRAM_write_data <= {G_accumulator_O[23:16], B_accumulator_O[23:16]};
+				SRAM_write_data <= {G_O, B_O};
+				//SRAM_write_data <= {G_accumulator_O[23:16], B_accumulator_O[23:16]};
 			
 				FIR_bufV[5] <= FIR_bufV[0];
 				FIR_bufU[5] <= FIR_bufU[0];
@@ -1457,7 +1480,8 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				SRAM_address <= SRAM_address_RGB;
 				SRAM_address_RGB <= SRAM_address_RGB + 18'd1;
 				
-				SRAM_write_data <= {R_accumulator_E[23:16], G_accumulator_E[23:16]};
+				SRAM_write_data <= {R_E, G_E};
+				//SRAM_write_data <= {R_accumulator_E[23:16], G_accumulator_E[23:16]};
 				SRAM_we_n <= 1'b0;
 				
 				Y <= SRAM_read_data;
@@ -1483,7 +1507,8 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				SRAM_address <= SRAM_address_RGB;
 				SRAM_address_RGB <= SRAM_address_RGB + 18'd1;
 			
-				SRAM_write_data <= {B_accumulator_E[23:16], R_accumulator_O[23:16]};
+				SRAM_write_data <= {B_E, R_O};
+				//SRAM_write_data <= {B_accumulator_E[23:16], R_accumulator_O[23:16]};
 			
 				upsampled_U <= U_accumulator[15:8];
 				
@@ -1510,7 +1535,8 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				SRAM_address <= SRAM_address_RGB;
 				SRAM_address_RGB <= SRAM_address_RGB + 18'd1;
 			
-				SRAM_write_data <= {G_accumulator_O[23:16], B_accumulator_O[23:16]};
+				SRAM_write_data <= {G_O, B_O};
+				//SRAM_write_data <= {G_accumulator_O[23:16], B_accumulator_O[23:16]};
 				
 				coefficient_select_U <= 2'd2;
 				
@@ -1616,7 +1642,8 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				SRAM_address <= SRAM_address_RGB;
 				SRAM_address_RGB <= SRAM_address_RGB + 18'd1;
 			
-				SRAM_write_data <= {R_accumulator_E[23:16], G_accumulator_E[23:16]};
+				SRAM_write_data <= {R_E, G_E};
+				//SRAM_write_data <= {R_accumulator_E[23:16], G_accumulator_E[23:16]};
 				SRAM_we_n <= 1'b0;
 				
 				Y <= SRAM_read_data;
@@ -1646,7 +1673,8 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				SRAM_address <= SRAM_address_RGB;
 				SRAM_address_RGB <= SRAM_address_RGB + 18'd1;
 			
-				SRAM_write_data <= {B_accumulator_E[23:16], R_accumulator_O[23:16]};
+				SRAM_write_data <= {B_E, R_O};
+				//SRAM_write_data <= {B_accumulator_E[23:16], R_accumulator_O[23:16]};
 			
 				UCSC_sram_data[0] <= SRAM_read_data;
 			
@@ -1679,7 +1707,8 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				SRAM_address <= SRAM_address_RGB;
 				SRAM_address_RGB <= SRAM_address_RGB + 18'd1;
 			
-				SRAM_write_data <= {G_accumulator_O[23:16], B_accumulator_O[23:16]};
+				SRAM_write_data <= {G_O, B_O};
+				//SRAM_write_data <= {G_accumulator_O[23:16], B_accumulator_O[23:16]};
 				
 				UCSC_sram_data[1] <= SRAM_read_data;
 			
@@ -1758,7 +1787,8 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				SRAM_address <= SRAM_address_RGB;
 				SRAM_address_RGB <= SRAM_address_RGB + 18'd1;
 			
-				SRAM_write_data <= {R_accumulator_E[23:16], G_accumulator_E[23:16]};
+				SRAM_write_data <= {R_E, G_E};
+				//SRAM_write_data <= {R_accumulator_E[23:16], G_accumulator_E[23:16]};
 				SRAM_we_n <= 1'b0;
 			
 				UCSC_state <= S_LEAD_OUT_66;
@@ -1768,8 +1798,9 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 			
 				SRAM_address <= SRAM_address_RGB;
 				SRAM_address_RGB <= SRAM_address_RGB + 18'd1;
-			
-				SRAM_write_data <= {B_accumulator_E[23:16], R_accumulator_O[23:16]};
+
+				SRAM_write_data <= {B_E, R_O};
+				//SRAM_write_data <= {B_accumulator_E[23:16], R_accumulator_O[23:16]};
 			
 				UCSC_state <= S_LEAD_OUT_67;
 			
@@ -1779,7 +1810,8 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				SRAM_address <= SRAM_address_RGB;
 				SRAM_address_RGB <= SRAM_address_RGB + 18'd1;
 			
-				SRAM_write_data <= {G_accumulator_O[23:16], B_accumulator_O[23:16]};
+				SRAM_write_data <= {G_O, B_O};
+				//SRAM_write_data <= {G_accumulator_O[23:16], B_accumulator_O[23:16]};
 				
 				Y <= SRAM_read_data;
 				
@@ -1798,6 +1830,58 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 			default: UCSC_state <= S_UCSC_IDLE;
 		endcase
 	end
+end
+
+always_comb begin
+
+	R_E = R_accumulator_E[23:16];
+	if (R_accumulator_E[24]) begin
+		R_E = 8'hff;
+	end
+	if (R_accumulator_E[31]) begin
+		R_E = 8'h0;
+	end
+	
+	G_E = G_accumulator_E[23:16];
+	if (G_accumulator_E[24]) begin
+		G_E = 8'hff;
+	end
+	if (G_accumulator_E[31]) begin
+		G_E = 8'h0;
+	end
+	
+	B_E = B_accumulator_E[23:16];
+	if (B_accumulator_E[24]) begin
+		B_E = 8'hff;
+	end
+	if (B_accumulator_E[31]) begin
+		B_E = 8'h0;
+	end
+	
+	R_O = R_accumulator_O[23:16];
+	if (R_accumulator_O[24]) begin
+		R_O = 8'hff;
+	end
+	if (R_accumulator_O[31]) begin
+		R_O = 8'h0;
+	end
+	
+	G_O = G_accumulator_O[23:16];
+	if (G_accumulator_O[24]) begin
+		G_O = 8'hff;
+	end
+	if (G_accumulator_O[31]) begin
+		G_O = 8'h0;
+	end
+	
+	B_O = B_accumulator_O[23:16];
+	if (B_accumulator_O[24]) begin
+		B_O = 8'hff;
+	end
+	if (B_accumulator_O[31]) begin
+		B_O = 8'h0;
+	end
+
 end
 
 always_comb begin
