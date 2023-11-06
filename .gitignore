@@ -24,6 +24,9 @@
 !*.png
 !*.txt
 !*.pdf
+!*.sram_d0
+!*.sram_d1
+!*.sram_d2
 
 # Hardware design/verification files
 !*.svh
