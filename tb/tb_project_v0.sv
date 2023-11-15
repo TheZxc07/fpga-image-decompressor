@@ -187,7 +187,7 @@ module TB;
 		num_unwritten_locations = 0;
 		//NOTE: this is for milestone 1, in different milestones we will be
 		//writing to different regions so modify as needed
-		for (i=146944; i<262144; i=i+1) begin
+		for (i=0; i<76799; i=i+1) begin
 			if (SRAM_ARRAY_write_count[i]==0) begin
 				if (num_unwritten_locations < `MAX_MISMATCHES) begin
 					$write("error: did not write to location %d (%x hex)\n", i, i);

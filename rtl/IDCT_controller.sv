@@ -670,8 +670,11 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				
 				i <= i + 3'd1;
 				
-				IDCT_state <= S_IDCT_S_8x8_LEAD_IN_0;
-				
+				if (Finish) begin
+					IDCT_state <= S_IDCT_IDLE;
+				end else begin
+					IDCT_state <= S_IDCT_S_8x8_LEAD_IN_0;
+				end
 			end
 			
 			S_IDCT_S_8x8_LEAD_IN_0: begin
@@ -1267,6 +1270,8 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 		segment_indicator_r <= 1'd0;
 		segment_indicator_w <= 1'd0;
 		
+		Finish <= 1'b0;
+		
 		IS_state <= S_IS_IDLE;
 	
 	end else begin
@@ -1545,8 +1550,9 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 							//segment_indicator <= segment_indicator + 2'd1;
 							//block_cont_i_w <= 5'd0;
 							segment_indicator_w <= 1'b1;
-						end else begin
-							//block_cont_i_w <= block_cont_i_w + 5'd1;
+						end
+						if (block_cont_i_w == 7'd89) begin
+							Finish <= 1'b1;
 						end
 						block_cont_i_w <= block_cont_i_w + 5'd1;
 					end else begin
