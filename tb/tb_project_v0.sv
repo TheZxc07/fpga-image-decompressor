@@ -26,7 +26,7 @@ add your own.
 `include "../rtl/VGA_param.h"
 
 `define FEOF 32'hFFFFFFFF
-`define MAX_MISMATCHES 100000
+`define MAX_MISMATCHES 10
 
 // file for output
 // this is only useful if decoding is done all the way through
@@ -34,10 +34,10 @@ add your own.
 
 // file for comparison
 // to test milestone 2 independently, use the .sram_d1 file to check the output
-`define VERIFICATION_FILE_NAME "../data/motorcycle.sram_d0"
+`define VERIFICATION_FILE_NAME "../data/motorcycle.sram_d1"
 
 // input file for milestone 1
-`define INPUT_FILE_NAME "../data/motorcycle.sram_d1"
+`define INPUT_FILE_NAME "../data/motorcycle.sram_d2"
 
 // input file for milestone 2
 //`define INPUT_FILE_NAME "../data/motorcycle.sram_d2"
@@ -276,18 +276,25 @@ module TB;
 	// if the incoming data does not match the expected data
 	// then stop simulating and print debug info
 	always @ (posedge clock_50) begin
+		if(UUT.IDCT_unit.block_cont_j_r == 6'd27  && UUT.IDCT_unit.block_cont_i_r == 6'd1) begin
+				//$stop;
+		end
+		if (UUT.UART_timer == 20'd323140) begin
+			//$stop;
+			
+		end
 		if (UUT.SRAM_we_n == 1'b0) begin // signal names within project (instantiated as UUT) should match here
 						 // (assuming names from experiment4 from lab 5)
 
-			// IMPORTANT: this is the "no write" memory region for milestone 1, change region for different milestones
-			if (UUT.SRAM_address < 146944) begin
-				if (warn_writing_out_of_region < `MAX_MISMATCHES) begin
-					$write("critical warning: writing outside of the RGB data region, may corrupt source data in SRAM\n");
-					$write("  writing value %d (%x hex) to location %d (%x hex), sim time %t\n",
-						UUT.SRAM_write_data, UUT.SRAM_write_data, UUT.SRAM_address, UUT.SRAM_address, $realtime);
-					warn_writing_out_of_region = warn_writing_out_of_region + 1;
-				end
-			end
+//			// IMPORTANT: this is the "no write" memory region for milestone 1, change region for different milestones
+//			if (UUT.SRAM_address < 146944) begin
+//				if (warn_writing_out_of_region < `MAX_MISMATCHES) begin
+//					$write("critical warning: writing outside of the RGB data region, may corrupt source data in SRAM\n");
+//					$write("  writing value %d (%x hex) to location %d (%x hex), sim time %t\n",
+//						UUT.SRAM_write_data, UUT.SRAM_write_data, UUT.SRAM_address, UUT.SRAM_address, $realtime);
+//					warn_writing_out_of_region = warn_writing_out_of_region + 1;
+//				end
+//			end
 
 			if (SRAM_ARRAY[UUT.SRAM_address] != UUT.SRAM_write_data) begin
 				$write("error: wrote value %d (%x hex) to location %d (%x hex), should be value %d (%x hex)\n",
@@ -309,6 +316,7 @@ module TB;
 				$write("warning: written %d times to location %d (%x hex), sim time %t\n",
 					SRAM_ARRAY_write_count[UUT.SRAM_address], UUT.SRAM_address, UUT.SRAM_address, $realtime);
 				warn_multiple_writes_to_same_location = warn_multiple_writes_to_same_location + 1;
+				//$stop;
 			end
 		end
 	end

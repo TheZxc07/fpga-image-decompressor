@@ -73,15 +73,21 @@ logic SRAM_ready;
 logic M1_finish;
 logic M1_start;
 
+logic M2_finish;
+logic M2_start;
+
 // For UART SRAM interface
 logic UART_rx_enable;
 logic UART_rx_initialize;
 logic [17:0] UART_SRAM_address;
 logic [17:0] UCSC_SRAM_address;
+logic [17:0] IDCT_SRAM_address;
 logic [15:0] UART_SRAM_write_data;
 logic [15:0] UCSC_SRAM_write_data;
+logic [15:0] IDCT_SRAM_write_data;
 logic UART_SRAM_we_n;
 logic UCSC_SRAM_we_n;
+logic IDCT_SRAM_we_n;
 logic [25:0] UART_timer;
 
 logic [6:0] value_7_segment [7:0];
@@ -172,6 +178,19 @@ interp_colourspace_conversion UCSC_unit (
 	.SRAM_address(UCSC_SRAM_address)
 );
 
+IDCT_controller IDCT_unit (
+	.Clock(CLOCK_50_I),
+	.Resetn(resetn),
+	
+	.SRAM_read_data(SRAM_read_data),
+	.Start(M2_start),
+	.Finish(M2_finish),
+	
+	.SRAM_we_n(IDCT_SRAM_we_n),
+	.SRAM_write_data(IDCT_SRAM_write_data),
+	.SRAM_address(IDCT_SRAM_address)
+);
+
 assign SRAM_ADDRESS_O[19:18] = 2'b00;
 
 always @(posedge CLOCK_50_I or negedge resetn) begin
@@ -185,6 +204,7 @@ always @(posedge CLOCK_50_I or negedge resetn) begin
 		VGA_enable <= 1'b1;
 		
 		M1_start <= 1'b0;
+		M2_start <= 1'b0;
 	end else begin
 
 		// By default the UART timer (used for timeout detection) is incremented
@@ -219,8 +239,8 @@ always @(posedge CLOCK_50_I or negedge resetn) begin
 
 			// Timeout for 1 sec on UART (detect if file transmission is finished)
 			if (UART_timer == 26'd49999999) begin
-				M1_start <= 1'b1;
-				top_state <= S_M1;
+				M2_start <= 1'b1;
+				top_state <= S_M2;
 				UART_timer <= 26'd0;
 			end
 		end
@@ -231,6 +251,15 @@ always @(posedge CLOCK_50_I or negedge resetn) begin
 			
 				top_state <= S_IDLE;
 				
+			end
+		
+		end
+		
+		S_M2: begin
+		
+			if (M2_finish) begin
+			
+				top_state <= S_IDLE;
 			end
 		
 		end
@@ -270,6 +299,14 @@ always_comb begin
 			SRAM_write_data = UCSC_SRAM_write_data;
 			SRAM_we_n = UCSC_SRAM_we_n;
 			SRAM_address = UCSC_SRAM_address;
+		
+		end
+		
+		S_M2: begin
+			
+			SRAM_write_data = IDCT_SRAM_write_data;
+			SRAM_we_n = IDCT_SRAM_we_n;
+			SRAM_address = IDCT_SRAM_address;
 		
 		end
 		
