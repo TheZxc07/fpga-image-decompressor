@@ -20,8 +20,13 @@ module IDCT_controller (
 
 	output logic 				SRAM_we_n,
    output logic   [15:0]   SRAM_write_data,
-   output logic   [17:0]   SRAM_address
-
+   output logic   [17:0]   SRAM_address,
+	
+	output logic 	[6:0] 	S_prime_RAM_address,
+	input logic 	[15:0]	S_prime_RAM_read_data,
+	
+	output logic 				fill_s_prime
+	
 );
 
 IDCT_Controller_state_type IDCT_state;
@@ -46,7 +51,7 @@ logic [31:0] M_data_buf [1:0];
 logic [2:0] i;
 logic [2:0] j;
 
-logic fill_s_prime;
+//logic fill_s_prime;
 logic write_s;
 logic s_prime_full;
 logic op_select;
@@ -221,6 +226,8 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 		S_prime_write_data_a <= 16'd0;
 		S_prime_write_enable_a <= 1'b0;
 		
+		//Compute_M_finish <= 1'b0;
+		
 		row_identifier <= 1'b0;
 		M_write_data_a <= 32'd0;
 		
@@ -240,6 +247,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				if (Start & ~start_buf) begin
 					
 					fill_s_prime <= 1'b1;
+					//get_s_prime <= 1'b1;
 					
 					IDCT_state <= S_IDCT_WAIT_FILL_S_PRIME_DPRAM;
 				end
@@ -250,8 +258,12 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 			
 				if (s_prime_full) begin
 					IDCT_state <= S_IDCT_M_8x8_LEAD_IN_0;
+					//IDCT_state <= S_IDCT_IDLE;
+					
 					S_prime_address_a <= 5'd0;
 					fill_s_prime <= 1'b0;
+					
+					//Compute_M_finish <= 1'b0;
 					
 					coeff_address_a <= 4'd0;
 					
@@ -656,6 +668,8 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				
 				op_select <= ~op_select;
 				
+				//Compute_M_finish <= 1'b1;
+				
 				IDCT_state <= S_IDCT_M_8x8_LEAD_OUT_6;
 			
 			end
@@ -674,6 +688,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 					IDCT_state <= S_IDCT_IDLE;
 				end else begin
 					IDCT_state <= S_IDCT_S_8x8_LEAD_IN_0;
+					//IDCT_state <= S_IDCT_IDLE;
 				end
 			end
 			
@@ -686,7 +701,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				
 				coeff_address_a <= coeff_address_a + 4'd1;
 				
-				fill_s_prime <= 1'b0;
+				//fill_s_prime <= 1'b0;
 				
 				IDCT_state <= S_IDCT_S_8x8_LEAD_IN_1;
 			
@@ -1123,7 +1138,6 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 			
 			end
 			
-			
 			S_IDCT_S_COLUMN_15: begin
 			
 				S_prime_write_enable_a <= 1'b0;
@@ -1152,6 +1166,46 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 					IDCT_state <= S_IDCT_S_COLUMN_0;
 				end
 			end
+			
+//			S_IDCT_S_LEAD_OUT_8x8_0: begin
+//			
+//				accumulator <= result;
+//			
+//			end
+//			
+//			S_IDCT_S_LEAD_OUT_8x8_1: begin
+//			
+//				accumulator <= accumulator + result;
+//			
+//			end
+//			
+//			S_IDCT_S_LEAD_OUT_8x8_2: begin
+//			
+//				accumulator <= result;
+//			
+//			end
+//			
+//			S_IDCT_S_LEAD_OUT_8x8_3: begin
+//			
+//				accumulator <= accumulator + result;
+//			
+//			end
+//			
+//			S_IDCT_S_LEAD_OUT_8x8_4: begin
+//			
+//				accumulator <= result;
+//				
+//			end
+//			
+//			S_IDCT_S_LEAD_OUT_8x8_5: begin
+//			
+//				accumulator <= accumulator + result;
+//			
+//			end
+//			
+//			S_IDCT_S_LEAD_OUT_8x8_6: begin
+//			
+//			end
 			
 		endcase
 	end
@@ -1204,7 +1258,7 @@ logic [17:0] column_address_w;
 logic segment_indicator_r;
 logic segment_indicator_w;
  
-logic [15:0] SRAM_data [1:0];
+logic [15:0] S_prime_RAM_data [1:0];
 
 logic fill_s_prime_buf;
 
@@ -1270,6 +1324,8 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 		segment_indicator_r <= 1'd0;
 		segment_indicator_w <= 1'd0;
 		
+		S_prime_RAM_address <= 7'd127;
+		
 		Finish <= 1'b0;
 		
 		IS_state <= S_IS_IDLE;
@@ -1290,17 +1346,19 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				end
 				
 				if (write_s && ~write_s_buf) begin
-					IS_state <= S_IS_WRITE_S_LEAD_IN_0;
+					IS_state <= S_IS_WRITE_S_DELAY_0;
 				end
 			
 			end
 			
 			S_IS_FILL_S_PRIME_LEAD_IN_0: begin
 				
-				element_cont <= element_cont + 6'd1;
+				//element_cont <= element_cont + 6'd1;
 				
-				SRAM_address <= base_addr + row_address_r + column_address_r;
-				SRAM_we_n <= 1'b1;
+				//SRAM_address <= base_addr + row_address_r + column_address_r;
+				S_prime_RAM_address <= S_prime_RAM_address + 7'd1;
+				
+				//SRAM_we_n <= 1'b1;
 				
 				IS_state <= S_IS_FILL_S_PRIME_LEAD_IN_1;
 				
@@ -1308,9 +1366,11 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 			
 			S_IS_FILL_S_PRIME_LEAD_IN_1: begin
 			
-				element_cont <= element_cont + 6'd1;
+				//element_cont <= element_cont + 6'd1;
 			
-				SRAM_address <= base_addr + row_address_r + column_address_r;
+				//SRAM_address <= base_addr + row_address_r + column_address_r;
+				
+				S_prime_RAM_address <= S_prime_RAM_address + 7'd1;
 				
 				IS_state <= S_IS_FILL_S_PRIME_LEAD_IN_2;
 				
@@ -1318,9 +1378,12 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 			
 			S_IS_FILL_S_PRIME_LEAD_IN_2: begin
 			
-				element_cont <= element_cont + 6'd1;
+				//element_cont <= element_cont + 6'd1;
 			
-				SRAM_address <= base_addr + row_address_r + column_address_r;
+				//SRAM_address <= base_addr + row_address_r + column_address_r;
+				
+				S_prime_RAM_address <= S_prime_RAM_address + 7'd1;
+				S_prime_RAM_data[0] <= S_prime_RAM_read_data;
 				
 				IS_state <= S_IS_FILL_S_PRIME_LEAD_IN_3;
 			
@@ -1328,21 +1391,12 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 			
 			S_IS_FILL_S_PRIME_LEAD_IN_3: begin
 			
-				element_cont <= element_cont + 6'd1;
+				//element_cont <= element_cont + 6'd1;
 				
-				SRAM_address <= base_addr + row_address_r + column_address_r;
-				SRAM_data[0] <= SRAM_read_data;
+				//SRAM_address <= base_addr + row_address_r + column_address_r;
 				
-				IS_state <= S_IS_FILL_S_PRIME_LEAD_IN_4;
-			
-			end
-			
-			S_IS_FILL_S_PRIME_LEAD_IN_4: begin
-			
-				element_cont <= element_cont + 6'd1;
-				
-				SRAM_address <= base_addr + row_address_r + column_address_r;
-				SRAM_data[1] <= SRAM_read_data;
+				S_prime_RAM_address <= S_prime_RAM_address + 7'd1;
+				S_prime_RAM_data[1] <= S_prime_RAM_read_data;
 				
 				IS_state <= S_IS_FILL_S_PRIME_0;
 			
@@ -1350,69 +1404,74 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 			
 			S_IS_FILL_S_PRIME_0: begin
 			
-				element_cont <= element_cont + 6'd1;
+				//element_cont <= element_cont + 6'd1;
 				
-				SRAM_address <= base_addr + row_address_r + column_address_r;
-				SRAM_data[0] <= SRAM_read_data;
+				//SRAM_address <= base_addr + row_address_r + column_address_r;
+				S_prime_RAM_address <= S_prime_RAM_address + 7'd1;
+				S_prime_RAM_data[0] <= S_prime_RAM_read_data;
 				
 				S_prime_address_b <= S_prime_address_b + 5'd1;
-				S_prime_write_data_b <= {SRAM_data[0], SRAM_data[1]};
+				S_prime_write_data_b <= {S_prime_RAM_data[0], S_prime_RAM_data[1]};
 				S_prime_write_enable_b <= 1'b1;
 				
 				IS_state <= S_IS_FILL_S_PRIME_1;
-				
+			
 			end
 			
 			S_IS_FILL_S_PRIME_1: begin
 			
-				element_cont <= element_cont + 6'd1;
+				//element_cont <= element_cont + 6'd1;
 				
-				SRAM_address <= base_addr + row_address_r + column_address_r;
-				SRAM_data[1] <= SRAM_read_data;
+				//SRAM_address <= base_addr + row_address_r + column_address_r;
+				
+				S_prime_RAM_address <= S_prime_RAM_address + 7'd1;
+				S_prime_RAM_data[1] <= S_prime_RAM_read_data;
 				
 				S_prime_write_enable_b <= 1'b0;
-			
+				
 				IS_state <= S_IS_FILL_S_PRIME_2;
 				
 			end
 			
 			S_IS_FILL_S_PRIME_2: begin
 			
-				element_cont <= element_cont + 6'd1;
+				//element_cont <= element_cont + 6'd1;
 				
-				SRAM_address <= base_addr + row_address_r + column_address_r;
-				SRAM_data[0] <= SRAM_read_data;
+				//SRAM_address <= base_addr + row_address_r + column_address_r;
+				
+				S_prime_RAM_address <= S_prime_RAM_address + 7'd1;
+				S_prime_RAM_data[0] <= S_prime_RAM_read_data;
 				
 				S_prime_address_b <= S_prime_address_b + 5'd1;
-				S_prime_write_data_b <= {SRAM_data[0], SRAM_data[1]};
+				S_prime_write_data_b <= {S_prime_RAM_data[0], S_prime_RAM_data[1]};
 				S_prime_write_enable_b <= 1'b1;
 			
 				IS_state <= S_IS_FILL_S_PRIME_3;
-			
+				
 			end
 			
 			S_IS_FILL_S_PRIME_3: begin
 			
-				element_cont <= element_cont + 6'd1;
+				//element_cont <= element_cont + 6'd1;
 				
-				SRAM_address <= base_addr + row_address_r + column_address_r;
-				SRAM_data[1] <= SRAM_read_data;
+				S_prime_RAM_address <= S_prime_RAM_address + 7'd1;
+				S_prime_RAM_data[1] <= S_prime_RAM_read_data;
 				
 				S_prime_write_enable_b <= 1'b0;
-				
+			
 				IS_state <= S_IS_FILL_S_PRIME_4;
 			
 			end
 			
 			S_IS_FILL_S_PRIME_4: begin
 			
-				element_cont <= element_cont + 6'd1;
+				//element_cont <= element_cont + 6'd1;
 				
-				SRAM_address <= base_addr + row_address_r + column_address_r;
-				SRAM_data[0] <= SRAM_read_data;
+				S_prime_RAM_address <= S_prime_RAM_address + 7'd1;;
+				S_prime_RAM_data[0] <= S_prime_RAM_read_data;
 				
 				S_prime_address_b <= S_prime_address_b + 5'd1;
-				S_prime_write_data_b <= {SRAM_data[0], SRAM_data[1]};
+				S_prime_write_data_b <= {S_prime_RAM_data[0], S_prime_RAM_data[1]};
 				S_prime_write_enable_b <= 1'b1;
 				
 				IS_state <= S_IS_FILL_S_PRIME_5;
@@ -1421,10 +1480,10 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 			
 			S_IS_FILL_S_PRIME_5: begin
 			
-				element_cont <= element_cont + 6'd1;
+				//element_cont <= element_cont + 6'd1;
 				
-				SRAM_address <= base_addr + row_address_r + column_address_r;
-				SRAM_data[1] <= SRAM_read_data;
+				S_prime_RAM_address <= S_prime_RAM_address + 7'd1;
+				S_prime_RAM_data[1] <= S_prime_RAM_read_data;
 				
 				S_prime_write_enable_b <= 1'b0;
 				
@@ -1434,48 +1493,57 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 			
 			S_IS_FILL_S_PRIME_6: begin
 			
-				element_cont <= element_cont + 6'd1;
+				//element_cont <= element_cont + 6'd1;
 				
-				SRAM_address <= base_addr + row_address_r + column_address_r;
-				SRAM_data[0] <= SRAM_read_data;
+				S_prime_RAM_address <= S_prime_RAM_address + 7'd1;
+				S_prime_RAM_data[0] <= S_prime_RAM_read_data;
 				
 				S_prime_address_b <= S_prime_address_b + 5'd1;
-				S_prime_write_data_b <= {SRAM_data[0], SRAM_data[1]};
+				S_prime_write_data_b <= {S_prime_RAM_data[0], S_prime_RAM_data[1]};
 				S_prime_write_enable_b <= 1'b1;
-			
+				
 				IS_state <= S_IS_FILL_S_PRIME_7;
 			
 			end
 			
 			S_IS_FILL_S_PRIME_7: begin
 			
-				element_cont <= element_cont + 6'd1;
+				//element_cont <= element_cont + 6'd1;
 				
-				SRAM_address <= base_addr + row_address_r + column_address_r;
-				SRAM_data[1] <= SRAM_read_data;
+				S_prime_RAM_address <= S_prime_RAM_address + 7'd1;
+				S_prime_RAM_data[1] <= S_prime_RAM_read_data;
 				
 				S_prime_write_enable_b <= 1'b0;
 				
-				if (element_cont == 6'd68) begin
+				if (S_prime_RAM_address[5:0] == 6'd2) begin
 					s_prime_full <= 1'b1;
 					IS_state <= S_IS_IDLE;
-					element_cont <= 6'd0;
-					if (block_cont_j_r == last_row_block_r) begin
-						block_cont_j_r <= 6'd0;
-						if (block_cont_i_r == 7'd29 && ~segment_indicator_r) begin
-							block_cont_i_r <= 5'd0;
-							segment_indicator_r <= 1'b1;
-						end else begin
-							block_cont_i_r <= block_cont_i_r + 5'd1;
-						end
-					end else begin
-						block_cont_j_r <= block_cont_j_r + 6'd1;
-					end
+					//element_cont <= 6'd0;
+					S_prime_RAM_address <= S_prime_RAM_address - 7'd3;
+//					if (block_cont_j_r == last_row_block_r) begin
+//						block_cont_j_r <= 6'd0;
+//						if (block_cont_i_r == 7'd29 && ~segment_indicator_r) begin
+//							block_cont_i_r <= 5'd0;
+//							segment_indicator_r <= 1'b1;
+//						end else begin
+//							block_cont_i_r <= block_cont_i_r + 5'd1;
+//						end
+//					end else begin
+//						block_cont_j_r <= block_cont_j_r + 6'd1;
+//					end
 				end else begin
 					IS_state <= S_IS_FILL_S_PRIME_0;
 				end
 			
 			end
+			
+			S_IS_WRITE_S_DELAY_0: begin
+				IS_state <= S_IS_WRITE_S_DELAY_1;
+			end
+			
+			S_IS_WRITE_S_DELAY_1: begin
+				IS_state <= S_IS_WRITE_S_LEAD_IN_0;
+			end	
 			
 			S_IS_WRITE_S_LEAD_IN_0: begin
 			

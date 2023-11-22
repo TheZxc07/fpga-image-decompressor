@@ -76,6 +76,9 @@ logic M1_start;
 logic M2_finish;
 logic M2_start;
 
+logic MIC17_finish;
+logic MIC17_start;
+
 // For UART SRAM interface
 logic UART_rx_enable;
 logic UART_rx_initialize;
@@ -89,6 +92,10 @@ logic UART_SRAM_we_n;
 logic UCSC_SRAM_we_n;
 logic IDCT_SRAM_we_n;
 logic [25:0] UART_timer;
+
+logic [17:0] MIC17_SRAM_address;
+logic [15:0] MIC17_SRAM_write_data;
+logic MIC17_SRAM_we_n;
 
 logic [6:0] value_7_segment [7:0];
 
@@ -191,6 +198,20 @@ IDCT_controller IDCT_unit (
 	.SRAM_address(IDCT_SRAM_address)
 );
 
+MIC17_decompressor MIC17_unit (
+	.Clock(CLOCK_50_I),
+	.Resetn(resetn),
+	
+	.SRAM_read_data(SRAM_read_data),
+	.Start(MIC17_start),
+	.Finish(MIC17_finish),
+	
+	.SRAM_we_n(MIC17_SRAM_we_n),
+	.SRAM_write_data(MIC17_SRAM_write_data),
+	.SRAM_address(MIC17_SRAM_address)
+);
+
+
 assign SRAM_ADDRESS_O[19:18] = 2'b00;
 
 always @(posedge CLOCK_50_I or negedge resetn) begin
@@ -203,8 +224,10 @@ always @(posedge CLOCK_50_I or negedge resetn) begin
 		
 		VGA_enable <= 1'b1;
 		
-		M1_start <= 1'b0;
-		M2_start <= 1'b0;
+//		M1_start <= 1'b0;
+//		M2_start <= 1'b0;
+		MIC17_start <= 1'b0;
+	//	MIC17_finish <= 1'b0;
 	end else begin
 
 		// By default the UART timer (used for timeout detection) is incremented
@@ -239,26 +262,14 @@ always @(posedge CLOCK_50_I or negedge resetn) begin
 
 			// Timeout for 1 sec on UART (detect if file transmission is finished)
 			if (UART_timer == 26'd49999999) begin
-				M2_start <= 1'b1;
-				top_state <= S_M2;
+				MIC17_start <= 1'b1;
+				top_state <= S_MIC17;
 				UART_timer <= 26'd0;
 			end
 		end
 		
-		S_M1: begin
-		
-			if (M1_finish) begin
-			
-				top_state <= S_IDLE;
-				
-			end
-		
-		end
-		
-		S_M2: begin
-		
-			if (M2_finish) begin
-			
+		S_MIC17: begin
+			if (MIC17_finish) begin
 				top_state <= S_IDLE;
 			end
 		
@@ -294,19 +305,11 @@ always_comb begin
 		
 		end
 	
-		S_M1: begin
+		S_MIC17: begin
 		
-			SRAM_write_data = UCSC_SRAM_write_data;
-			SRAM_we_n = UCSC_SRAM_we_n;
-			SRAM_address = UCSC_SRAM_address;
-		
-		end
-		
-		S_M2: begin
-			
-			SRAM_write_data = IDCT_SRAM_write_data;
-			SRAM_we_n = IDCT_SRAM_we_n;
-			SRAM_address = IDCT_SRAM_address;
+			SRAM_write_data = MIC17_SRAM_write_data;
+			SRAM_we_n = MIC17_SRAM_we_n;
+			SRAM_address = MIC17_SRAM_address;
 		
 		end
 		

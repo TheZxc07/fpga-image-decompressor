@@ -26,7 +26,7 @@ add your own.
 `include "../rtl/VGA_param.h"
 
 `define FEOF 32'hFFFFFFFF
-`define MAX_MISMATCHES 10
+`define MAX_MISMATCHES 1000000000
 
 // file for output
 // this is only useful if decoding is done all the way through
@@ -37,13 +37,15 @@ add your own.
 `define VERIFICATION_FILE_NAME "../data/motorcycle.sram_d1"
 
 // input file for milestone 1
-`define INPUT_FILE_NAME "../data/motorcycle.sram_d2"
+// define INPUT_FILE_NAME "../data/motorcycle.sram_d2"
 
 // input file for milestone 2
 //`define INPUT_FILE_NAME "../data/motorcycle.sram_d2"
 
 // input file for milestone 3 (full project)
-//`define INPUT_FILE_NAME "../data/motorcycle.mic17"
+//`define INPUT_FILE_NAME "../data/noise.mic17"
+
+`define INPUT_FILE_NAME "../data/motorcycle.mic17"
 
 
 // the top module of the testbench
@@ -150,7 +152,7 @@ module TB;
 
 		$write("Opening file \"%s\" for initializing SRAM\n\n", `INPUT_FILE_NAME);
 		file_ptr = $fopen(`INPUT_FILE_NAME, "rb");
-		for (i=0; i<262144; i=i+1) begin
+		for (i=76800; i<262144; i=i+1) begin
 			file_data = $fgetc(file_ptr);
 			buffer[15:8] = file_data & 8'hFF;
 			file_data = $fgetc(file_ptr);
@@ -279,7 +281,7 @@ module TB;
 		if(UUT.IDCT_unit.block_cont_j_r == 6'd27  && UUT.IDCT_unit.block_cont_i_r == 6'd1) begin
 				//$stop;
 		end
-		if (UUT.UART_timer == 20'd323140) begin
+		if (UUT.UART_timer == 20'd38000002) begin
 			//$stop;
 			
 		end

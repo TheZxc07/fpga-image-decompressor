@@ -186,10 +186,10 @@ unsigned int read_bits(FILE *fp, int length) {	//can read up to 32 bits at once,
 	while (length>0) {
 		if (count==0) {	//buffer empty, read 16 bits
 			read_char = fgetc(fp);		//read high byte
-			if (read_char==EOF) { printf("unexpected end of file, exiting...\n"); exit(1); }
+			//if (read_char==EOF) { printf("unexpected end of file, exiting..., %c\n", read_char); exit(1); }
 			buffer = (read_char & 0xff) << 8;
 			read_char = fgetc(fp);		//read low byte
-			if (read_char==EOF) { printf("unexpected end of file, exiting...\n"); exit(1); }
+			//if (read_char==EOF) { printf("unexpected end of file, exiting..., %c\n", read_char); exit(1); }
 			buffer |= (read_char & 0xff);
 			count = 16;
 		}
