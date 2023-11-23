@@ -48,6 +48,7 @@ set_global_assignment -name EDA_OUTPUT_DATA_FORMAT "VERILOG HDL" -section_id eda
 set_global_assignment -name EDA_GENERATE_FUNCTIONAL_NETLIST OFF -section_id eda_simulation
 set_global_assignment -name STATE_MACHINE_PROCESSING "MINIMAL BITS"
 
+set_global_assignment -name SYSTEMVERILOG_FILE ../rtl/MIC17_decompressor.sv
 set_global_assignment -name VERILOG_FILE ../rtl/dual_port_RAM3.v
 set_global_assignment -name VERILOG_FILE ../rtl/dual_port_RAM2.v
 set_global_assignment -name VERILOG_FILE ../rtl/dual_port_RAM0.v
@@ -77,4 +78,6 @@ set_global_assignment -name SYSTEMVERILOG_FILE ../rtl/IDCT_controller.sv
 set_global_assignment -name SYSTEMVERILOG_FILE MIC17_decoder.sv
 set_global_assignment -name SOURCE_FILE db/project.cmp.rdb
 set_global_assignment -name SYSTEMVERILOG_FILE ../rtl/MIC17_decoder.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../rtl/decode_controller.sv
+set_global_assignment -name OPTIMIZATION_MODE "AGGRESSIVE PERFORMANCE"
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

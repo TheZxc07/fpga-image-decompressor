@@ -4,8 +4,7 @@
 typedef enum logic [1:0] {
 	S_IDLE,
 	S_UART_RX,
-	S_M1,
-	S_M2
+	S_MIC17
 } top_state_type;
 
 typedef enum logic [1:0] {
@@ -16,8 +15,46 @@ typedef enum logic [1:0] {
 } RX_Controller_state_type;
 
 typedef enum logic [1:0] {
-	S_DECODE_IDLE
-} full_decoder_state_type;
+	S_MIC17_IDLE,
+	S_MIC17_WAIT_M3_GET_S_PRIME,
+	S_MIC17_M3_M2,
+	S_MIC17_M1
+} MIC17_decompressor_state_type;
+
+typedef enum logic [3:0] {
+	S_DECODE_IDLE,
+	S_DECODE_WAIT_SETUP,
+	S_DECODE_AWAIT_INSTRUCTION,
+	S_DECODE_HUB,
+	S_DECODE_00X,
+	S_DECODE_01X,
+	S_DECODE_100,
+	S_DECODE_101,
+	S_DECODE_110,
+	S_DECODE_111
+} decoder_state_type;
+
+
+typedef enum logic [3:0] {
+	S_DECODE_SRAM_SETUP_0,
+	S_DECODE_SRAM_SETUP_1,
+	S_DECODE_SRAM_SETUP_2,
+	S_DECODE_SRAM_SETUP_3,
+	S_DECODE_SRAM_SETUP_4,
+	S_DECODE_SRAM_SETUP_5,
+	S_DECODE_SRAM_IDLE,
+	S_DECODE_SRAM_REQUEST_0,
+	S_DECODE_SRAM_REQUEST_1,
+	S_DECODE_SRAM_REQUEST_2
+} decoder_SRAM_state_type;
+
+typedef enum logic [2:0] {
+	S_SRAM_SETUP,
+	S_SRAM_REQUEST_IDLE,
+	S_SRAM_REQUEST_0,
+	S_SRAM_REQUEST_1,
+	S_SRAM_REQUEST_2
+} decoder_SRAM_request_state_type;
 
 typedef enum logic [4:0] {
 	S_IS_IDLE,
@@ -34,6 +71,8 @@ typedef enum logic [4:0] {
 	S_IS_FILL_S_PRIME_5,
 	S_IS_FILL_S_PRIME_6,
 	S_IS_FILL_S_PRIME_7,
+	S_IS_WRITE_S_DELAY_0,
+	S_IS_WRITE_S_DELAY_1,
 	S_IS_WRITE_S_LEAD_IN_0,
 	S_IS_WRITE_S_LEAD_IN_1,
 	S_IS_WRITE_S_0,

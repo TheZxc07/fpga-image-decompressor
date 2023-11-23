@@ -1835,7 +1835,7 @@ end
 always_comb begin
 
 	R_E = R_accumulator_E[23:16];
-	if (R_accumulator_E[24]) begin
+	if (|R_accumulator_E[31:24]) begin
 		R_E = 8'hff;
 	end
 	if (R_accumulator_E[31]) begin
@@ -1843,7 +1843,7 @@ always_comb begin
 	end
 	
 	G_E = G_accumulator_E[23:16];
-	if (G_accumulator_E[24]) begin
+	if (|G_accumulator_E[31:24]) begin
 		G_E = 8'hff;
 	end
 	if (G_accumulator_E[31]) begin
@@ -1851,7 +1851,7 @@ always_comb begin
 	end
 	
 	B_E = B_accumulator_E[23:16];
-	if (B_accumulator_E[24]) begin
+	if (|B_accumulator_E[31:24]) begin
 		B_E = 8'hff;
 	end
 	if (B_accumulator_E[31]) begin
@@ -1859,7 +1859,7 @@ always_comb begin
 	end
 	
 	R_O = R_accumulator_O[23:16];
-	if (R_accumulator_O[24]) begin
+	if (|R_accumulator_O[31:24]) begin
 		R_O = 8'hff;
 	end
 	if (R_accumulator_O[31]) begin
@@ -1867,7 +1867,7 @@ always_comb begin
 	end
 	
 	G_O = G_accumulator_O[23:16];
-	if (G_accumulator_O[24]) begin
+	if (|G_accumulator_O[31:24]) begin
 		G_O = 8'hff;
 	end
 	if (G_accumulator_O[31]) begin
@@ -1875,7 +1875,7 @@ always_comb begin
 	end
 	
 	B_O = B_accumulator_O[23:16];
-	if (B_accumulator_O[24]) begin
+	if (|B_accumulator_O[31:24]) begin
 		B_O = 8'hff;
 	end
 	if (B_accumulator_O[31]) begin

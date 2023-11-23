@@ -59,7 +59,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 	if (~Resetn) begin
 		SRAM_we_n <= 1'b1;
 		SRAM_write_data <= 16'd0;
-		SRAM_address <= 18'd0;
+		SRAM_address <= 18'd76800;
 		
 		UART_rx_enable <= 1'b0;
 		UART_rx_unload_data <= 1'b0;
@@ -84,9 +84,9 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 			S_US_IDLE: begin
 				if (Enable == 1'b1) begin
 					// Start receiving data from UART
-					UART_SRAM_state <= S_US_START_FIRST_BYTE_RECEIVE;
+					UART_SRAM_state <= S_US_STRIP_FILE_HEADER_1;
 					UART_rx_enable <= 1'b1;
-					SRAM_address <= 18'd0;				
+					SRAM_address <= 18'd76800;				
 				end
 			end
 			S_US_STRIP_FILE_HEADER_1: begin
