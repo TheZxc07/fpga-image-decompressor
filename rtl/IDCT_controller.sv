@@ -25,7 +25,8 @@ module IDCT_controller (
 	output logic 	[6:0] 	S_prime_RAM_address,
 	input logic 	[15:0]	S_prime_RAM_read_data,
 	
-	output logic 				fill_s_prime
+	output logic 				fill_s_prime,
+	input logic 				m3_s_filled
 	
 );
 
@@ -78,6 +79,8 @@ assign coeff_write_data_a = 32'd0;
 assign coeff_write_data_b = 32'd0;
 assign coeff_write_enable_a = 1'b0;
 assign coeff_write_enable_b = 1'b0;
+
+assign M_write_enable_b = 1'b0;
 
 dual_port_RAM0 coeff_RAM (
 	.address_a ( {3'b0, coeff_address_a} ),
@@ -209,7 +212,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 	if (~Resetn) begin
 	
 		op_select <= 1'b0;
-		M_write_enable_b <= 1'b0;
+		//M_write_enable_b <= 1'b0;
 		matrix_select <= 1'b1;
 		fill_s_prime <= 1'b0;
 		write_s <= 1'b0;
@@ -256,7 +259,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 			
 			S_IDCT_WAIT_FILL_S_PRIME_DPRAM: begin
 			
-				if (s_prime_full) begin
+				if (s_prime_full && m3_s_filled) begin
 					IDCT_state <= S_IDCT_M_8x8_LEAD_IN_0;
 					//IDCT_state <= S_IDCT_IDLE;
 					
@@ -1267,14 +1270,14 @@ logic write_s_buf;
 logic [17:0] row_address_UV;
 logic [17:0] row_address_Y;
 
-assign last_row_block_r = segment_indicator_r ? 6'd19 : 6'd39;
+//assign last_row_block_r = segment_indicator_r ? 6'd19 : 6'd39;
 
 assign last_row_block_w = segment_indicator_w ? 6'd19 : 6'd39;
 
-assign row_address_Y_r = {{block_cont_i_r, element_row_r}, 8'b0} + {{block_cont_i_r, element_row_r}, 6'b0};
-assign row_address_UV_r = {{block_cont_i_r, element_row_r}, 7'b0} + {{block_cont_i_r, element_row_r}, 5'b0};
+//assign row_address_Y_r = {{block_cont_i_r, element_row_r}, 8'b0} + {{block_cont_i_r, element_row_r}, 6'b0};
+//assign row_address_UV_r = {{block_cont_i_r, element_row_r}, 7'b0} + {{block_cont_i_r, element_row_r}, 5'b0};
 
-assign column_address_r = {block_cont_j_r, element_column_r};
+//assign column_address_r = {block_cont_j_r, element_column_r};
 
 assign row_address_UV_w = {{{block_cont_i_w, element_row_w}, 6'b0} + {{block_cont_i_w, element_row_w}, 4'b0}} + 17'd19200;
 assign row_address_Y_w = {{block_cont_i_w, element_row_w}, 7'b0} + {{block_cont_i_w, element_row_w}, 5'b0};
@@ -1302,8 +1305,8 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 
 	if (~Resetn) begin
 	
-		block_cont_j_r <= 6'd0;
-		block_cont_i_r <= 5'd0;
+		//block_cont_j_r <= 6'd0;
+		//block_cont_i_r <= 5'd0;
 		block_cont_j_w <= 6'd0;
 		block_cont_i_w <= 5'd0;
 		
@@ -1321,7 +1324,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 		SRAM_we_n <= 1'b1;
 		SRAM_write_data <= 16'd0;
 		
-		segment_indicator_r <= 1'd0;
+		//segment_indicator_r <= 1'd0;
 		segment_indicator_w <= 1'd0;
 		
 		S_prime_RAM_address <= 7'd127;

@@ -111,7 +111,8 @@ IDCT_controller IDCT_unit (
 	.S_prime_RAM_address(S_prime_address_b),
 	.S_prime_RAM_read_data(S_prime_read_data_b),
 	
-	.fill_s_prime(fill_instruction)
+	.fill_s_prime(fill_instruction),
+	.m3_s_filled(S_prime_full)
 );	
 
 interp_colourspace_conversion UCSC_unit (

@@ -43,6 +43,7 @@ logic [5:0] RAM_address_main;
 logic RAM_segment;
 
 logic [4:0] index_ptr;
+//logic [4:0] next_index;
 logic [5:0] access_index;
 
 assign access_index = index_ptr + 5'd16;
@@ -63,7 +64,7 @@ logic [15:0] SRAM_data_buf_0;
 logic [15:0] SRAM_data_buf_1;
 logic [5:0] element_cont;
 
-logic [4:0] next_index;
+//logic [4:0] next_index;
 
 logic [2:0] count;
 
@@ -74,9 +75,9 @@ assign access_wire = {SR, SR[31:16]};
 
 wire [8:0] data_00x = access_wire[access_index-5'd2 -: 9];
 wire [3:0] data_01x = access_wire[access_index-5'd2 -: 4];
-wire [15:0] data_100 = access_wire[access_index-5'd3 -: 2];
-wire [15:0] data_101 = access_wire[access_index-5'd3 -: 2];
-wire [15:0] data_110 = access_wire[access_index-5'd3 -: 3];
+wire [2:0] data_100 = access_wire[access_index-5'd3 -: 2];
+wire [2:0] data_101 = access_wire[access_index-5'd3 -: 2];
+wire [2:0] data_110 = access_wire[access_index-5'd3 -: 3];
 
 logic [15:0] data;
 logic [2:0] k; 
@@ -101,6 +102,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 		k <= 3'd0;
 		RAM_segment <= 1'b1;
 		index_ptr <= 5'd31;
+		//next_index <= 5'd31;
 		element_cont <= 6'd0;
 		
 		RAM_address <= 7'd0;
@@ -123,6 +125,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 					element_cont <= 6'd0;
 					
 					index_ptr <= 5'd31;
+					//next_index <= 5'd31;
 				
 				end
 			
@@ -155,38 +158,61 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 					3'b000: begin
 						decode_state <= S_DECODE_00X;
 						data <= {7'h0, data_00x};
+						if (RAM_address[5:0] < 6'd63) begin
+							index_ptr <= index_ptr - 5'd11;
+						end
 					end
 					3'b001: begin
 						decode_state <= S_DECODE_00X;
 						data <= {7'h3f, data_00x};
+						if (RAM_address[5:0] < 6'd63) begin
+							index_ptr <= index_ptr - 5'd11;
+						end
 					end
 					3'b011: begin
 						decode_state <= S_DECODE_01X;
 						data <= {12'hfff, data_01x};
+						if (RAM_address[5:0] < 6'd63) begin
+							index_ptr <= index_ptr - 5'd6;
+						end
 					end
 					3'b010: begin
 						decode_state <= S_DECODE_01X;
 						data <= {12'h0, data_01x};
+						if (RAM_address[5:0] < 6'd63) begin
+							index_ptr <= index_ptr - 5'd6;
+						end
 					end
 					3'b100: begin
 						decode_state <= S_DECODE_100;
 						data <= -16'd1;
 						count <= data_100;
+						if (RAM_address[5:0] < 6'd63) begin
+							index_ptr <= index_ptr - 5'd5;
+						end
 					end
 					3'b101: begin
 						decode_state <= S_DECODE_101;
 						data <= 16'd1;
 						count <= data_101;
+						if (RAM_address[5:0] < 6'd63) begin
+							index_ptr <= index_ptr - 5'd5;
+						end
 					end
 					3'b110: begin
 						decode_state <= S_DECODE_110;
 						data <= 16'd0;
 						count <= data_110;
-						
+						if (RAM_address[5:0] < 6'd63) begin
+							index_ptr <= index_ptr - 5'd6;
+						end
 					end
 					3'b111:begin
 						decode_state <= S_DECODE_111;
 						data <= 16'd0;
+						if (RAM_address[5:0] < 6'd63) begin
+							index_ptr <= index_ptr - 5'd3;
+						end
 					end
 				endcase
 				
@@ -200,7 +226,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 			end
 			
 			S_DECODE_00X: begin
-				index_ptr <= index_ptr - 5'd11;
+				//index_ptr <= index_ptr - 5'd11;
 				RAM_address <= {RAM_segment, RAM_address_main};
 				RAM_write_enable <= 1'b1;
 				RAM_write_data <= dequantized_data;
@@ -209,7 +235,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				decode_state <= S_DECODE_HUB;
 			end
 			S_DECODE_01X: begin
-				index_ptr <= index_ptr - 5'd6;
+				//index_ptr <= index_ptr - 5'd6;
 				RAM_address <= {RAM_segment, RAM_address_main};
 				RAM_write_enable <= 1'b1;
 				RAM_write_data <= dequantized_data;
@@ -226,7 +252,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				if (count == 2'd0) begin
 					if (k == 3'd3) begin
 						decode_state <= S_DECODE_HUB;
-						index_ptr <= index_ptr - 5'd5;
+						//index_ptr <= index_ptr - 5'd5;
 						k <= 3'd0;
 					end else begin
 						k <= k + 3'd1;
@@ -234,7 +260,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				end else begin
 					if (k == (count-2'd1)) begin
 						decode_state <= S_DECODE_HUB;
-						index_ptr <= index_ptr - 5'd5;
+						//index_ptr <= index_ptr - 5'd5;
 						k <= 3'd0;
 					end else begin
 						k <= k + 3'd1;
@@ -250,7 +276,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				if (count == 2'd0) begin
 					if (k == 3'd3) begin
 						decode_state <= S_DECODE_HUB;
-						index_ptr <= index_ptr - 5'd5;
+						//index_ptr <= index_ptr - 5'd5;
 						k <= 3'd0;
 					end else begin
 						k <= k + 3'd1;
@@ -258,7 +284,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				end else begin
 					if (k == (count-2'd1)) begin
 						decode_state <= S_DECODE_HUB;
-						index_ptr <= index_ptr - 5'd5;
+						//index_ptr <= index_ptr - 5'd5;
 						k <= 3'd0;
 					end else begin
 						k <= k + 3'd1;
@@ -274,7 +300,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				if (count == 3'd0) begin
 					if (k == 3'd7) begin
 						decode_state <= S_DECODE_HUB;
-						index_ptr <= index_ptr - 5'd6;
+						//index_ptr <= index_ptr - 5'd6;
 						k <= 3'd0;
 					end else begin
 						k <= k + 3'd1;
@@ -282,7 +308,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				end else begin
 					if (k == (count-2'd1)) begin
 						decode_state <= S_DECODE_HUB;
-						index_ptr <= index_ptr - 5'd6;
+						//index_ptr <= index_ptr - 5'd6;
 						k <= 3'd0;
 					end else begin
 						k <= k + 3'd1;
@@ -298,7 +324,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				
 				if (element_cont == 6'd63) begin
 					decode_state <= S_DECODE_HUB;
-					index_ptr <= index_ptr - 5'd3;
+					//index_ptr <= index_ptr - 5'd3;
 				end
 			end
 		endcase
@@ -307,17 +333,17 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 
 end
 
-always_latch begin
-	case(decode_state)
-		S_DECODE_00X: next_index = index_ptr - 5'd11;
-		S_DECODE_01X: next_index = index_ptr - 5'd6;
-		S_DECODE_100: next_index = index_ptr - 5'd5;
-		S_DECODE_101: next_index = index_ptr - 5'd5;
-		S_DECODE_110: next_index = index_ptr - 5'd6;
-		S_DECODE_111: next_index = index_ptr - 5'd3;
-		default: next_index = next_index;
-	endcase
-end
+//always_latch begin
+//	case(decode_state)
+//		S_DECODE_00X: next_index <= index_ptr - 5'd11;
+//		S_DECODE_01X: next_index <= index_ptr - 5'd6;
+//		S_DECODE_100: next_index <= index_ptr - 5'd5;
+//		S_DECODE_101: next_index <= index_ptr - 5'd5;
+//		S_DECODE_110: next_index <= index_ptr - 5'd6;
+//		S_DECODE_111: next_index <= index_ptr - 5'd3;
+//		default: next_index <= next_index;
+//	endcase
+//end
 
 logic setup_0;
 
@@ -508,7 +534,7 @@ end
 
 always_comb begin
 
-	if (next_index < 5'd16) begin
+	if (index_ptr < 5'd16) begin
 		load = 1'b1;
 	end else begin
 		load = 1'b0;

@@ -30,11 +30,13 @@ add your own.
 
 // file for output
 // this is only useful if decoding is done all the way through
-`define OUTPUT_FILE_NAME "../data/motorcycle_tb.ppm"
+`define OUTPUT_FILE_NAME "../data/high_tb.ppm"
 
 // file for comparison
 // to test milestone 2 independently, use the .sram_d1 file to check the output
-`define VERIFICATION_FILE_NAME "../data/motorcycle.sram_d1"
+//`define VERIFICATION_FILE_NAME "../data/motorcycle.sram_d0"
+`define VERIFICATION_FILE_NAME "../data/highfreq.sram_d0"
+
 
 // input file for milestone 1
 // define INPUT_FILE_NAME "../data/motorcycle.sram_d2"
@@ -43,9 +45,9 @@ add your own.
 //`define INPUT_FILE_NAME "../data/motorcycle.sram_d2"
 
 // input file for milestone 3 (full project)
-//`define INPUT_FILE_NAME "../data/noise.mic17"
+`define INPUT_FILE_NAME "../data/highfreq.mic17"
 
-`define INPUT_FILE_NAME "../data/motorcycle.mic17"
+//`define INPUT_FILE_NAME "../data/motorcycle.mic17"
 
 
 // the top module of the testbench
@@ -189,7 +191,7 @@ module TB;
 		num_unwritten_locations = 0;
 		//NOTE: this is for milestone 1, in different milestones we will be
 		//writing to different regions so modify as needed
-		for (i=0; i<76799; i=i+1) begin
+		for (i=146944; i<=262143; i=i+1) begin
 			if (SRAM_ARRAY_write_count[i]==0) begin
 				if (num_unwritten_locations < `MAX_MISMATCHES) begin
 					$write("error: did not write to location %d (%x hex)\n", i, i);
