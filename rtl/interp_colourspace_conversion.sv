@@ -35,8 +35,8 @@ logic [7:0] V_buf;
 logic [15:0] UCSC_sram_data [1:0];
 logic [7:0] UCSC_sram_data_buf [1:0];
 
-logic [7:0] upsampled_U;
-logic [7:0] upsampled_V;
+logic [15:0] upsampled_U;
+logic [15:0] upsampled_V;
 logic [31:0] U_accumulator;
 logic [31:0] V_accumulator;
 
@@ -107,8 +107,8 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 		U_accumulator <= 32'h0;
 		Y <= 16'h0;
 		
-		upsampled_V <= 8'd0;
-		upsampled_U <= 8'd0;
+		upsampled_V <= 16'd0;
+		upsampled_U <= 16'd0;
 		
 		SRAM_address_RGB <= 18'd146944;
 		SRAM_address_Y <= 18'd0;
@@ -315,7 +315,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				coefficient_select_V <= 2'd2;
 				coefficient_select_U <= 2'd1;
 				
-				V_accumulator <= V_accumulator + prod_2;
+				V_accumulator <= V_accumulator - prod_2;
 				U_accumulator <= 32'd128 + prod_3;
 				
 				V_buf <= FIR_bufV[0];
@@ -335,7 +335,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				coefficient_select_U <= 2'd2;
 				
 				V_accumulator <= V_accumulator + prod_2;
-				U_accumulator <= U_accumulator + prod_3;
+				U_accumulator <= U_accumulator - prod_3;
 				
 				UCSC_state <= S_LEAD_IN_DELAY_14;
 				
@@ -375,7 +375,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				coefficient_select_V <= 2'd0;
 				coefficient_select_U <= 2'd1;
 				
-				V_accumulator <= V_accumulator + prod_2;
+				V_accumulator <= V_accumulator - prod_2;
 				U_accumulator <= U_accumulator + prod_3;
 				
 				UCSC_state <= S_LEAD_IN_DELAY_16;
@@ -394,7 +394,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				coefficient_select_U <= 2'd0;
 				
 				V_accumulator <= V_accumulator + prod_2;
-				U_accumulator <= U_accumulator + prod_3;
+				U_accumulator <= U_accumulator - prod_3;
 			
 				UCSC_state <= S_LEAD_IN_DELAY_17;
 			
@@ -411,7 +411,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 					FIR_bufU[i] <= FIR_bufU[i+1];
 				end
 				
-				upsampled_V <= V_accumulator[15:8];
+				upsampled_V <= V_accumulator[23:8];
 				
 				coefficient_select_V <= 2'd1;
 				
@@ -436,7 +436,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 					FIR_bufU[i] <= FIR_bufU[i-1];
 				end
 			
-				upsampled_U <= U_accumulator[15:8];
+				upsampled_U <= U_accumulator[23:8];
 				
 				coefficient_select_V <= 2'd2;
 				coefficient_select_U <= 2'd1;
@@ -444,7 +444,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				coefficient_select_RGB <= 3'd1;
 				op_select_RGB <= 2'd1;
 				
-				V_accumulator <= V_accumulator + prod_2;
+				V_accumulator <= V_accumulator - prod_2;
 				U_accumulator <= 32'd128 + prod_3; 
 				
 				R_accumulator_E <= prod_1[31:0];
@@ -475,7 +475,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				op_select_RGB <= 2'd2;
 				
 				V_accumulator <= V_accumulator + prod_2;
-				U_accumulator <= U_accumulator + prod_3;
+				U_accumulator <= U_accumulator - prod_3;
 			
 				R_accumulator_E <= R_accumulator_E + prod_1[31:0];
 				R_accumulator_O <= R_accumulator_O + prod_4[31:0];
@@ -526,7 +526,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				
 				UCSC_sram_data_buf[1] <= FIR_bufU[5];
 				
-				V_accumulator <= V_accumulator + prod_2;
+				V_accumulator <= V_accumulator - prod_2;
 				U_accumulator <= U_accumulator + prod_3;
 			
 				G_accumulator_E <= G_accumulator_E + prod_1[31:0];
@@ -540,7 +540,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				coefficient_select_U <= 2'd0;
 				
 				V_accumulator <= V_accumulator + prod_2;
-				U_accumulator <= U_accumulator + prod_3;
+				U_accumulator <= U_accumulator - prod_3;
 				
 				B_accumulator_E <= B_accumulator_E + prod_1[31:0];
 				B_accumulator_O <= B_accumulator_O + prod_4[31:0];
@@ -569,7 +569,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 					FIR_bufV[i] <= FIR_bufV[i+1];
 				end
 				
-				upsampled_V <= V_accumulator[15:8];
+				upsampled_V <= V_accumulator[23:8];
 				V_buf <= FIR_bufV[1];
 				
 				coefficient_select_V <= 2'd1;
@@ -601,7 +601,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 					FIR_bufV[i] <= FIR_bufV[i+1];
 				end
 							
-				upsampled_U <= U_accumulator[15:8];
+				upsampled_U <= U_accumulator[23:8];
 				U_buf <= FIR_bufU[1];
 				
 				coefficient_select_V <= 2'd2;
@@ -610,7 +610,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				coefficient_select_RGB <= 3'd1;
 				op_select_RGB <= 2'd1;
 				
-				V_accumulator <= V_accumulator + prod_2;
+				V_accumulator <= V_accumulator - prod_2;
 				U_accumulator <= 32'd128 + prod_3;
 				
 				R_accumulator_E <= prod_1[31:0];
@@ -644,7 +644,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				op_select_RGB <= 2'd2;	
 				
 				V_accumulator <= V_accumulator + prod_2;
-				U_accumulator <= U_accumulator + prod_3;
+				U_accumulator <= U_accumulator - prod_3;
 				
 				R_accumulator_E <= R_accumulator_E + prod_1[31:0];
 				R_accumulator_O <= R_accumulator_O + prod_4[31:0];
@@ -706,7 +706,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				coefficient_select_RGB <= 3'd4;
 				op_select_RGB <= 2'd2;	
 				
-				V_accumulator <= V_accumulator + prod_2;
+				V_accumulator <= V_accumulator - prod_2;
 				U_accumulator <= U_accumulator + prod_3;
 				
 				G_accumulator_E <= G_accumulator_E + prod_1[31:0];
@@ -731,7 +731,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				coefficient_select_U <= 2'd0;
 		
 				V_accumulator <= V_accumulator + prod_2;
-				U_accumulator <= U_accumulator + prod_3;
+				U_accumulator <= U_accumulator - prod_3;
 				
 				B_accumulator_E <= B_accumulator_E + prod_1[31:0];
 				B_accumulator_O <= B_accumulator_O + prod_4[31:0];
@@ -764,7 +764,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 					FIR_bufV[i] <= FIR_bufV[i-1];
 				end
 				
-				upsampled_V <= V_accumulator[15:8];
+				upsampled_V <= V_accumulator[23:8];
 				V_buf <= FIR_bufV[2];
 
 				coefficient_select_V <= 2'd1;
@@ -798,7 +798,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 					FIR_bufV[i] <= FIR_bufV[i-1];
 				end
 				
-				upsampled_U <= U_accumulator[15:8];
+				upsampled_U <= U_accumulator[23:8];
 				U_buf <= FIR_bufU[2];
 				
 				coefficient_select_V <= 2'd2;
@@ -807,7 +807,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				coefficient_select_RGB <= 3'd1;
 				op_select_RGB <= 2'd1;	
 				
-				V_accumulator <= V_accumulator + prod_2;
+				V_accumulator <= V_accumulator - prod_2;
 				U_accumulator <= 32'd128 + prod_3;
 
 				R_accumulator_E <= prod_1[31:0];
@@ -843,7 +843,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				op_select_RGB <= 2'd2;	
 				
 				V_accumulator <= V_accumulator + prod_2;
-				U_accumulator <= U_accumulator + prod_3;
+				U_accumulator <= U_accumulator - prod_3;
 				
 				R_accumulator_E <= R_accumulator_E + prod_1[31:0];
 				R_accumulator_O <= R_accumulator_O + prod_4[31:0];
@@ -903,7 +903,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				coefficient_select_RGB <= 3'd4;
 				op_select_RGB <= 2'd2;				
 				
-				V_accumulator <= V_accumulator + prod_2;
+				V_accumulator <= V_accumulator - prod_2;
 				U_accumulator <= U_accumulator + prod_3;
 
 				G_accumulator_E <= G_accumulator_E + prod_1[31:0];
@@ -927,7 +927,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				coefficient_select_U <= 2'd0;
 				
 				V_accumulator <= V_accumulator + prod_2;
-				U_accumulator <= U_accumulator + prod_3;
+				U_accumulator <= U_accumulator - prod_3;
 				
 				B_accumulator_E <= B_accumulator_E + prod_1[31:0];
 				B_accumulator_O <= B_accumulator_O + prod_4[31:0];
@@ -958,7 +958,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 					FIR_bufV[i] <= FIR_bufV[i+1];
 				end
 				
-				upsampled_V <= V_accumulator[15:8];
+				upsampled_V <= V_accumulator[23:8];
 				V_buf <= FIR_bufV[1];
 				
 				coefficient_select_V <= 2'd1;
@@ -990,7 +990,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 					FIR_bufV[i] <= FIR_bufV[i+1];
 				end
 							
-				upsampled_U <= U_accumulator[15:8];
+				upsampled_U <= U_accumulator[23:8];
 				U_buf <= FIR_bufU[1];
 				
 				coefficient_select_V <= 2'd2;
@@ -999,7 +999,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				coefficient_select_RGB <= 3'd1;
 				op_select_RGB <= 2'd1;
 				
-				V_accumulator <= V_accumulator + prod_2;
+				V_accumulator <= V_accumulator - prod_2;
 				U_accumulator <= 32'd128 + prod_3;
 				
 				R_accumulator_E <= prod_1[31:0];
@@ -1034,7 +1034,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				op_select_RGB <= 2'd2;	
 				
 				V_accumulator <= V_accumulator + prod_2;
-				U_accumulator <= U_accumulator + prod_3;
+				U_accumulator <= U_accumulator - prod_3;
 				
 				R_accumulator_E <= R_accumulator_E + prod_1[31:0];
 				R_accumulator_O <= R_accumulator_O + prod_4[31:0];
@@ -1096,7 +1096,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				coefficient_select_RGB <= 3'd4;
 				op_select_RGB <= 2'd2;	
 				
-				V_accumulator <= V_accumulator + prod_2;
+				V_accumulator <= V_accumulator - prod_2;
 				U_accumulator <= U_accumulator + prod_3;
 				
 				G_accumulator_E <= G_accumulator_E + prod_1[31:0];
@@ -1119,7 +1119,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				coefficient_select_U <= 2'd0;
 		
 				V_accumulator <= V_accumulator + prod_2;
-				U_accumulator <= U_accumulator + prod_3;
+				U_accumulator <= U_accumulator - prod_3;
 				
 				B_accumulator_E <= B_accumulator_E + prod_1[31:0];
 				B_accumulator_O <= B_accumulator_O + prod_4[31:0];
@@ -1149,7 +1149,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				coefficient_select_RGB <= 3'd0;
 				op_select_RGB <= 2'd0;
 				
-				upsampled_V <= V_accumulator[15:8];
+				upsampled_V <= V_accumulator[23:8];
 				
 				V_accumulator <= 32'd128 + prod_2;
 				U_accumulator <= U_accumulator + prod_3;
@@ -1173,7 +1173,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 					FIR_bufV[i] <= FIR_bufV[i-1];
 				end
 			
-				upsampled_U <= U_accumulator[15:8];
+				upsampled_U <= U_accumulator[23:8];
 				
 				coefficient_select_V <= 2'd2;
 				coefficient_select_U <= 2'd1;
@@ -1181,7 +1181,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				coefficient_select_RGB <= 3'd1;
 				op_select_RGB <= 2'd1;
 				
-				V_accumulator <= V_accumulator + prod_2;
+				V_accumulator <= V_accumulator - prod_2;
 				U_accumulator <= 32'd128 + prod_3;
 				
 				R_accumulator_E <= prod_1[31:0];
@@ -1217,7 +1217,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				op_select_RGB <= 2'd2;
 				
 				V_accumulator <= V_accumulator + prod_2;
-				U_accumulator <= U_accumulator + prod_3;
+				U_accumulator <= U_accumulator - prod_3;
 				
 				R_accumulator_E <= R_accumulator_E + prod_1[31:0];
 				R_accumulator_O <= R_accumulator_O + prod_4[31:0];
@@ -1276,7 +1276,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				coefficient_select_RGB <= 3'd4;
 				op_select_RGB <= 2'd2;
 				
-				V_accumulator <= V_accumulator + prod_2;
+				V_accumulator <= V_accumulator - prod_2;
 				U_accumulator <= U_accumulator + prod_3;
 			
 				G_accumulator_E <= G_accumulator_E + prod_1[31:0];
@@ -1302,7 +1302,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				coefficient_select_U <= 2'd0;
 				
 				V_accumulator <= V_accumulator + prod_2;
-				U_accumulator <= U_accumulator + prod_3;
+				U_accumulator <= U_accumulator - prod_3;
 				
 				B_accumulator_E <= B_accumulator_E + prod_1[31:0];
 				B_accumulator_O <= B_accumulator_O + prod_4[31:0];
@@ -1329,7 +1329,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 					FIR_bufU[i] <= FIR_bufU[i+1];
 				end
 				
-				upsampled_V <= V_accumulator[15:8];
+				upsampled_V <= V_accumulator[23:8];
 				
 				V_buf <= FIR_bufV[1];
 				
@@ -1360,7 +1360,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 					FIR_bufU[i] <= FIR_bufU[i+1];
 				end
 				
-				upsampled_U <= U_accumulator[15:8]; 
+				upsampled_U <= U_accumulator[23:8]; 
 				
 				U_buf <= FIR_bufU[1];
 				
@@ -1370,7 +1370,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				coefficient_select_RGB <= 3'd1;
 				op_select_RGB <= 2'd1;
 				
-				V_accumulator <= V_accumulator + prod_2;
+				V_accumulator <= V_accumulator - prod_2;
 				U_accumulator <= 32'd128 + prod_3;
 
 				R_accumulator_E <= prod_1[31:0];
@@ -1404,7 +1404,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				op_select_RGB <= 2'd2;
 				
 				V_accumulator <= V_accumulator + prod_2;
-				U_accumulator <= U_accumulator + prod_3;
+				U_accumulator <= U_accumulator - prod_3;
 				
 				R_accumulator_E <= R_accumulator_E + prod_1[31:0];
 				R_accumulator_O <= R_accumulator_O + prod_4[31:0];
@@ -1453,7 +1453,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				coefficient_select_RGB <= 3'd4;
 				op_select_RGB <= 2'd2;
 			
-				V_accumulator <= V_accumulator + prod_2;
+				V_accumulator <= V_accumulator - prod_2;
 				U_accumulator <= U_accumulator + prod_3;
 				
 				G_accumulator_E <= G_accumulator_E + prod_1[31:0];
@@ -1467,7 +1467,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				coefficient_select_U <= 2'd0;
 			
 				V_accumulator <= V_accumulator + prod_2;
-				U_accumulator <= U_accumulator + prod_3;
+				U_accumulator <= U_accumulator - prod_3;
 			
 				B_accumulator_E <= B_accumulator_E + prod_1[31:0];
 				B_accumulator_O <= B_accumulator_O + prod_4[31:0];
@@ -1486,7 +1486,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				
 				Y <= SRAM_read_data;
 			
-				upsampled_V <= V_accumulator[15:8];
+				upsampled_V <= V_accumulator[23:8];
 				
 				V_buf <= FIR_bufV[5];
 				U_buf <= FIR_bufU[5];
@@ -1510,7 +1510,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				SRAM_write_data <= {B_E, R_O};
 				//SRAM_write_data <= {B_accumulator_E[23:16], R_accumulator_O[23:16]};
 			
-				upsampled_U <= U_accumulator[15:8];
+				upsampled_U <= U_accumulator[23:8];
 				
 				coefficient_select_V <= 2'd2;
 				coefficient_select_U <= 2'd1;
@@ -1518,7 +1518,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				coefficient_select_RGB <= 3'd1;
 				op_select_RGB <= 2'd1;
 			
-				V_accumulator <= V_accumulator + prod_2;
+				V_accumulator <= V_accumulator - prod_2;
 				U_accumulator <= 32'd128 + prod_3;
 				
 				R_accumulator_E <= prod_1[31:0];
@@ -1544,7 +1544,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				op_select_RGB <= 2'd2;
 			
 				V_accumulator <= V_accumulator + prod_2;
-				U_accumulator <= U_accumulator + prod_3;
+				U_accumulator <= U_accumulator - prod_3;
 				
 				R_accumulator_E <= R_accumulator_E + prod_1[31:0];
 				R_accumulator_O <= R_accumulator_O + prod_4[31:0];
@@ -1604,7 +1604,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				coefficient_select_RGB <= 3'd4;
 				op_select_RGB <= 2'd2;
 				
-				V_accumulator <= V_accumulator + prod_2;
+				V_accumulator <= V_accumulator - prod_2;
 				U_accumulator <= U_accumulator + prod_3;
 			
 				G_accumulator_E <= G_accumulator_E + prod_1[31:0];
@@ -1629,7 +1629,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				coefficient_select_U <= 2'd0;
 				
 				V_accumulator <= V_accumulator + prod_2;
-				U_accumulator <= U_accumulator + prod_3;
+				U_accumulator <= U_accumulator - prod_3;
 			
 				B_accumulator_E <= B_accumulator_E + prod_1[31:0];
 				B_accumulator_O <= B_accumulator_O + prod_4[31:0];
@@ -1658,7 +1658,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 					FIR_bufU[i] <= FIR_bufU[i-1];
 				end
 				
-				upsampled_V <= V_accumulator[15:8];
+				upsampled_V <= V_accumulator[23:8];
 				
 				coefficient_select_RGB <= 3'd0;
 				op_select_RGB <= 2'd0;
@@ -1686,7 +1686,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 					FIR_bufU[i] <= FIR_bufU[i+1];
 				end
 				
-				upsampled_U <= U_accumulator[15:8]; 
+				upsampled_U <= U_accumulator[23:8]; 
 				
 				V_buf <= FIR_bufV[2];
 				
@@ -1922,7 +1922,7 @@ always_comb begin
 	case(coefficient_select_V)
 	
 		2'd0  : op1_2 = 16'd21;
-		2'd1	: op1_2 = -16'd52;
+		2'd1	: op1_2 = 16'd52;
 		2'd2	: op1_2 = 16'd159;
 		
 		default op1_2 = 16'd0;
@@ -1935,7 +1935,7 @@ always_comb begin
 	case(coefficient_select_U)
 	
 		2'd0 : op1_3 = 16'd21;
-		2'd1	: op1_3 = -16'd52;
+		2'd1	: op1_3 = 16'd52;
 		2'd2	: op1_3 = 16'd159;
 		
 		default op1_3 = 16'd0;
@@ -1957,10 +1957,10 @@ assign Y_E_long = {{24{1'b0}}, Y[15:8]};
 assign Y_O_long = {{24{1'b0}}, Y[7:0]};
 
 assign V_long = {{24{1'b0}}, V_buf};
-assign upsampled_V_long = {{24{1'b0}}, upsampled_V};
+assign upsampled_V_long = {{16{upsampled_V[15]}}, upsampled_V};
 
 assign U_long = {{24{1'b0}}, U_buf};
-assign upsampled_U_long = {{24{1'b0}}, upsampled_U};
+assign upsampled_U_long = {{16{upsampled_U[15]}}, upsampled_U};
 
 always_comb begin
 
