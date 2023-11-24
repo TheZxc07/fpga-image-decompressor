@@ -14,8 +14,11 @@ typedef enum logic [1:0] {
 	S_RXC_STOP_BIT
 } RX_Controller_state_type;
 
-typedef enum logic [1:0] {
+typedef enum logic [2:0] {
 	S_MIC17_IDLE,
+	S_MIC17_GET_QUANTIZATION_MATRIX_0,
+	S_MIC17_GET_QUANTIZATION_MATRIX_1,
+	S_MIC17_GET_QUANTIZATION_MATRIX_2,
 	S_MIC17_WAIT_M3_GET_S_PRIME,
 	S_MIC17_M3_M2,
 	S_MIC17_M1

@@ -13,7 +13,7 @@ module IDCT_controller (
 
    input  logic   [15:0]   SRAM_read_data,
 	input  logic 				Start,
-	input  logic				SFull,
+	//input  logic				SFull,
 	
 	output logic				Finish,
 	//input  logic 	[9:0]	   j;

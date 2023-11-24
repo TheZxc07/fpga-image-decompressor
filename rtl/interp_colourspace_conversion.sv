@@ -64,6 +64,8 @@ logic [31:0] R_accumulator_O;
 logic [31:0] G_accumulator_O;
 logic [31:0] B_accumulator_O;
 
+logic start_buf;
+
 logic [7:0] R_E;
 logic [7:0] G_E;
 logic [7:0] B_E;
@@ -127,6 +129,8 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 		G_accumulator_O <= 32'h0;
 		B_accumulator_O <= 32'h0;
 		
+		start_buf <= 1'b0;
+		
 		coefficient_select_V <= 2'b0;
 		coefficient_select_U <= 2'b0;
 		
@@ -146,7 +150,8 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 	end else begin
 		case(UCSC_state)
 			S_UCSC_IDLE: begin
-				if (Start) begin
+				start_buf <= Start;
+				if (Start & ~start_buf) begin
 					SRAM_address_RGB <= 18'd146944;
 					SRAM_address_Y <= 18'd0;
 					SRAM_address_U <= 18'd38400;

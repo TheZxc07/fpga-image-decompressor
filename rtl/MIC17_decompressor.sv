@@ -39,6 +39,7 @@ logic quantization_matrix;
 logic [17:0] UCSC_SRAM_address;
 logic [17:0] IDCT_SRAM_address;
 logic [17:0] decode_SRAM_address;
+logic [17:0] MIC17_SRAM_address;
 
 logic [15:0] UCSC_SRAM_write_data;
 logic [15:0] IDCT_SRAM_write_data;
@@ -57,7 +58,7 @@ logic S_prime_full;
 logic fill_instruction;
 logic Fill_instruction;
 
-assign quantization_matrix = 1'b0;
+//assign quantization_matrix = 1'b0;
 
 
 MIC17_decompressor_state_type MIC17_state;
@@ -136,6 +137,8 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 
 	if (~Resetn) begin
 	
+		quantization_matrix <= 1'b0;
+	
 		decode_start <= 1'b0;
 		Finish <= 1'b0;
 		start_buf <= 1'b0;
@@ -143,6 +146,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 		M1_start <= 1'b0;
 		Finish <= 1'b0;
 		get_s_prime <= 1'b0;
+		MIC17_SRAM_address <= 18'd0;
 	
 		MIC17_state <= S_MIC17_IDLE;
 	
@@ -155,12 +159,28 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				start_buf <= Start;
 				if (Start && ~start_buf) begin
 					Finish <= 1'b0;
-					MIC17_state <= S_MIC17_WAIT_M3_GET_S_PRIME;
-					decode_start <= 1'b1;
-					get_s_prime <= 1'b1;
+					MIC17_state <= S_MIC17_GET_QUANTIZATION_MATRIX_0;
+					//decode_start <= 1'b1;
+					//get_s_prime <= 1'b1;
+					MIC17_SRAM_address <=  18'd76802;
 					
 				end
 			
+			end
+			
+			S_MIC17_GET_QUANTIZATION_MATRIX_0: begin
+				MIC17_state <= S_MIC17_GET_QUANTIZATION_MATRIX_1;
+			end
+			
+			S_MIC17_GET_QUANTIZATION_MATRIX_1: begin
+				MIC17_state <= S_MIC17_GET_QUANTIZATION_MATRIX_2;
+			end
+			
+			S_MIC17_GET_QUANTIZATION_MATRIX_2: begin
+				quantization_matrix <= SRAM_read_data[15];
+				decode_start <= 1'b1;
+				get_s_prime <= 1'b1;
+				MIC17_state <= S_MIC17_WAIT_M3_GET_S_PRIME;
 			end
 			
 			S_MIC17_WAIT_M3_GET_S_PRIME: begin
@@ -231,7 +251,7 @@ always_comb begin
 		end
 		
 		default: begin
-			SRAM_address = 18'd0;
+			SRAM_address = MIC17_SRAM_address;
 			SRAM_write_data = 16'd0;
 			SRAM_we_n = 1'b1;
 		end

@@ -172,32 +172,6 @@ SRAM_controller SRAM_unit (
 	.SRAM_OE_N_O(SRAM_OE_N_O)
 );
 
-interp_colourspace_conversion UCSC_unit (
-	.Clock(CLOCK_50_I),
-	.Resetn(resetn),
-	
-	.SRAM_read_data(SRAM_read_data),
-	.Start(M1_start),
-	.Finish(M1_finish),
-	
-	.SRAM_we_n(UCSC_SRAM_we_n),
-	.SRAM_write_data(UCSC_SRAM_write_data),
-	.SRAM_address(UCSC_SRAM_address)
-);
-
-IDCT_controller IDCT_unit (
-	.Clock(CLOCK_50_I),
-	.Resetn(resetn),
-	
-	.SRAM_read_data(SRAM_read_data),
-	.Start(M2_start),
-	.Finish(M2_finish),
-	
-	.SRAM_we_n(IDCT_SRAM_we_n),
-	.SRAM_write_data(IDCT_SRAM_write_data),
-	.SRAM_address(IDCT_SRAM_address)
-);
-
 MIC17_decompressor MIC17_unit (
 	.Clock(CLOCK_50_I),
 	.Resetn(resetn),
@@ -271,6 +245,7 @@ always @(posedge CLOCK_50_I or negedge resetn) begin
 		S_MIC17: begin
 			if (MIC17_finish) begin
 				top_state <= S_IDLE;
+				MIC17_start <= 1'b0;
 			end
 		
 		end

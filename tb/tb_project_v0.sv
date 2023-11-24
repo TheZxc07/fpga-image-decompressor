@@ -30,12 +30,12 @@ add your own.
 
 // file for output
 // this is only useful if decoding is done all the way through
-`define OUTPUT_FILE_NAME "../data/motor.ppm"
+`define OUTPUT_FILE_NAME "../data/motodee.ppm"
 
 // file for comparison
 // to test milestone 2 independently, use the .sram_d1 file to check the output
 //`define VERIFICATION_FILE_NAME "../data/motorcycle.sram_d0"
-`define VERIFICATION_FILE_NAME "../data/noisy.sram_d0"
+`define VERIFICATION_FILE_NAME "../data/motorcycleq1.sram_d0"
 
 
 // input file for milestone 1
@@ -45,7 +45,7 @@ add your own.
 //`define INPUT_FILE_NAME "../data/motorcycle.sram_d2"
 
 // input file for milestone 3 (full project)
-`define INPUT_FILE_NAME "../data/noisy.mic17"
+`define INPUT_FILE_NAME "../data/motorcycleq1.mic17"
 
 //`define INPUT_FILE_NAME "../data/motorcycle.mic17"
 
@@ -273,16 +273,16 @@ module TB;
                 else
 			$write("A total of %d mismatches!\n\n", number_of_mismatches);
 
-		$stop;
+		//$stop;
 	end
 
 	// monitor the write enable signal on the SRAM
 	// if the incoming data does not match the expected data
 	// then stop simulating and print debug info
 	always @ (posedge clock_50) begin
-		if(UUT.IDCT_unit.block_cont_j_r == 6'd27  && UUT.IDCT_unit.block_cont_i_r == 6'd1) begin
+		//if(UUT.IDCT_unit.block_cont_j_r == 6'd27  && UUT.IDCT_unit.block_cont_i_r == 6'd1) begin
 				//$stop;
-		end
+		//end
 		if (UUT.UART_timer == 20'd38000002) begin
 			//$stop;
 			
@@ -322,6 +322,12 @@ module TB;
 				warn_multiple_writes_to_same_location = warn_multiple_writes_to_same_location + 1;
 				//$stop;
 			end
+		end
+	end
+	
+	always @ (posedge clock_50) begin
+		if(UUT.UART_timer == 0) begin
+			$write("ping\n");
 		end
 	end
 

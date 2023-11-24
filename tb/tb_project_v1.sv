@@ -27,16 +27,16 @@ has been done in the project and the R/G/B data is displayed on the screen.
 
 // file for comparison
 // (adapt depending on how you have out PPM file from the SW model)
-`define COMPARE_FILE_NAME "../data/motorcycle_sw.ppm"
+`define COMPARE_FILE_NAME "../data/motorcycleq1.ppm"
 
 // input file for milestone 1
-`define INPUT_FILE_NAME "../data/motorcycle.sram_d1"
+//`define INPUT_FILE_NAME "../data/motorcycle.sram_d1"
 
 // input file for milestone 2
 //`define INPUT_FILE_NAME "../data/motorcycle.sram_d2"
 
 // input file for milestone 3 (full project)
-//`define INPUT_FILE_NAME "../data/motorcycle.mic17"
+`define INPUT_FILE_NAME "../data/motorcycleq1.mic17"
 
 // the top module of the testbench
 module TB;
@@ -341,6 +341,12 @@ module TB;
 		$fwrite(frame_fd, "P6%c%s%c255%c", 8'h0A, str_tmp, 8'h0A, 8'h0A);
 	end
 	endtask
+	
+	always @ (posedge clock_50) begin
+		if (UUT.SRAM_we_n == 1'b0 && UUT.SRAM_address == 18'd146944) begin
+			$write("hello");
+		end
+	end
 
 	task write_vga_frame();
 		static int vga_row, vga_col;
